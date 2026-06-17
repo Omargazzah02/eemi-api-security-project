@@ -1,7 +1,8 @@
-require('dotenv').config(); 
+require('dotenv').config();
 const express = require('express');
 const sequelize = require('./config/database');
 const bcrypt = require('bcrypt');
+const sanitizeHtml = require('sanitize-html');
 
 const User = require('./models/user.model');
 const Order = require('./models/order.model');
@@ -9,9 +10,13 @@ const Order = require('./models/order.model');
 // Import des fichiers de routes
 const authRoutes = require('./routes/auth.route');
 const orderRoutes = require('./routes/order.route');
+// Import du middleware personnalisé
+const xssClean = require('./middlewares/xss.middleware');
 
 const app = express();
 app.use(express.json());
+//  Activation du middleware XSS global
+app.use(xssClean);
 
 // CONFIGURATION DES ROUTES
 
