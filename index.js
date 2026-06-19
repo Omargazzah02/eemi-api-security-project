@@ -3,6 +3,7 @@ const express = require('express');
 const sequelize = require('./config/database');
 const bcrypt = require('bcrypt');
 const sanitizeHtml = require('sanitize-html');
+const helmet = require('helmet');
 
 const User = require('./models/user.model');
 const Order = require('./models/order.model');
@@ -10,18 +11,23 @@ const Order = require('./models/order.model');
 // Import des fichiers de routes
 const authRoutes = require('./routes/auth.route');
 const orderRoutes = require('./routes/order.route');
+
 // Import du middleware personnalisé
+const corsMiddleware = require('./middlewares/cors.middleware');
 const xssClean = require('./middlewares/xss.middleware');
+const loginLimiter = require('./middlewares/rateLimit.middleware'); 
 
 const app = express();
+app.use(corsMiddleware);
 app.use(express.json());
-//  Activation du middleware XSS global
 app.use(xssClean);
+app.use(helmet());
+
 
 // CONFIGURATION DES ROUTES
 
 // Routes d'authentification (Inscriptions / Connexions)
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', loginLimiter,authRoutes);
 
 // Routes des commandes (Toutes protégées en interne par le middleware JWT)
 app.use('/api/orders', orderRoutes);
