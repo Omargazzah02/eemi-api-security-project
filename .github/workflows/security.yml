@@ -3,9 +3,9 @@ name: Security Pipeline
 # RÈGLE : s’exécuter automatiquement sur push ou pull_request
 on:
   push:
-    branches: [ "secure" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "secure" ]
+    branches: [ "main" ]
 
 jobs:
   security-pipeline:
