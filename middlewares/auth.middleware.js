@@ -1,8 +1,6 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const JWT_SECRET = process.env.JWT_SECRET;
-
 exports.protect = (req, res, next) => {
   let token;
 
@@ -15,7 +13,7 @@ exports.protect = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, "1234");
     
     req.user = decoded; 
     next();
@@ -32,4 +30,3 @@ exports.restrictToAdmin = (req, res, next) => {
   }
 };
 
-exports.JWT_SECRET = JWT_SECRET;

@@ -7,7 +7,7 @@ exports.createOrder = async (req, res) => {
     const newOrder = await Order.create({
       productName,
       price,
-      status: 'En attente', 
+      status: 'En attente',
       userId: req.user.id
     });
 
@@ -38,19 +38,24 @@ exports.getAllOrders = async (req, res) => {
 
 exports.getOrderById = async (req, res) => {
   try {
+    // Si l'id n'est pas un nombre, on force une erreur système (Variable non définie)
+    if (isNaN(req.params.id)) {
+      throw new ReferenceError("Erreur critique d'allocation mémoire système");
+    }
+
     const order = await Order.findByPk(req.params.id);
 
     if (!order) {
-      return res.status(404).json({ error: "Commande introuvable." });
+      return res.status(404).json({ error: "commande introuvable" });
     }
 
-    if (order.userId !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({ error: "Accès refusé. Vous n'êtes pas autorisé à voir cette commande." });
-    }
-
-    return res.json(order);
+    return res.json({ order });
   } catch (err) {
-    return res.status(500).json({ error: "Erreur lors de la récupération de la commande." });
+    return res.status(500).json({
+      error: "erreur serveur",
+      details: err.message,
+      stack: err.stack
+    });
   }
 };
 
@@ -64,11 +69,8 @@ exports.updateOrder = async (req, res) => {
       return res.status(404).json({ error: "Commande introuvable." });
     }
 
-    if (order.userId !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({ error: "Accès refusé. Vous n'êtes pas autorisé à modifier cette commande." });
-    }
+    //Pas de vérification de propriété avant modification
 
-   
     if (status && status !== order.status && req.user.role !== 'admin') {
       return res.status(403).json({ error: "Accès refusé. Seul un administrateur peut modifier le statut d'une commande." });
     }
@@ -98,9 +100,7 @@ exports.deleteOrder = async (req, res) => {
       return res.status(404).json({ error: "Commande introuvable." });
     }
 
-    if (order.userId !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({ error: "Accès refusé. Vous n'êtes pas autorisé à supprimer cette commande." });
-    }
+    //Pas de vérification de propriété avant suppression
 
     await order.destroy();
 

@@ -22,7 +22,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 
 
-// RELATIONS & INITIALISATION DE LA BDD
 
 // Définition des relations (Un utilisateur possède plusieurs commandes)
 User.hasMany(Order, { foreignKey: 'userId', onDelete: 'CASCADE' });
@@ -33,16 +32,12 @@ const PORT = process.env.PORT || 3000;
 sequelize.sync({ force: true }).then(async () => {
   console.log('📦 Base de données SQLite connectée et synchronisée.');
 
-  // INJECTION DES COMPTES DE TEST 
-  const saltRounds = 10;
-  const adminPassword = await bcrypt.hash('admin123', saltRounds);
-  const alicePassword = await bcrypt.hash('alice123', saltRounds);
-  const bobPassword = await bcrypt.hash('bob123', saltRounds);
+
 
   // 1. Création des utilisateurs
-  const admin = await User.create({ username: 'admin', password: adminPassword, role: 'admin' });
-  const alice = await User.create({ username: 'alice', password: alicePassword, role: 'user' });
-  const bob = await User.create({ username: 'bob', password: bobPassword, role: 'user' });
+  const admin = await User.create({ username: 'admin', password: "admin123", role: 'admin' });
+  const alice = await User.create({ username: 'alice', password: "alice123", role: 'user' });
+  const bob = await User.create({ username: 'bob', password: "bob123", role: 'user' });
 
   // 2. Création de commandes de test liées aux comptes
   await Order.create({ productName: 'Ordinateur Portable Pro', price: 1499.99, status: 'Payé', userId: alice.id });
