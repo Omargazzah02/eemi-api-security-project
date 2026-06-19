@@ -44,18 +44,10 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # RÈGLE : échouer si un secret est détecté
-
-      # RÈGLE : lancer un scan DAST si possible (Objectif : tester l’application en fonctionnement)
-      - name: Start Application for DAST
+          
+      # RÈGLE : Lancer un scan DAST (Analyse dynamique de l'application en cours d'exécution)
+      - name: Actual DAST Scan (OWASP ZAP)
         run: |
           npm start &
           sleep 5
-          
-   # RÈGLE : lancer un scan DAST si possible (Application + Scan combinés)
-      - name: DAST Scan (OWASP ZAP baseline)
-        uses: zaproxy/action-baseline@v0.14.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'http://localhost:3000'
-          fail_action: false 
-          cmd_options: '-v'
+          docker run --network="host" -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 || true
