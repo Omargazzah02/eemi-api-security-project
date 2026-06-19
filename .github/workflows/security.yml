@@ -49,12 +49,10 @@ jobs:
       - name: Start Application for DAST
         run: |
           npm start &
-          sleep 10 
+          sleep 60
           
       - name: DAST Scan (OWASP ZAP baseline)
         uses: zaproxy/action-baseline@v0.14.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'http://localhost:3000'
-          docker_name: 'host'
-          fail_action: true
+          target: 'http://172.17.0.1:3000'
+          fail_action: true # Force l'échec de la pipeline en cas de faille détectée
