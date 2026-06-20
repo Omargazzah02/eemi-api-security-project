@@ -3,13 +3,22 @@ const Order = require('../models/order.model');
 exports.createOrder = async (req, res) => {
   const { productName, price } = req.body;
 
+  // Validation des entrées
+  if (!productName || typeof productName !== 'string' || productName.trim() === '') {
+    return res.status(400).json({ error: "Le nom du produit est requis et doit être valide." });
+  }
+  if (price === undefined || isNaN(price) || Number(price) < 0) {
+    return res.status(400).json({ error: "Le prix doit être un nombre positif." });
+  }
+
   try {
     const newOrder = await Order.create({
       productName,
       price,
-      status: 'En attente', 
+      status: 'En attente',
       userId: req.user.id
     });
+
 
     return res.status(201).json({
       message: "Commande créée avec succès !",
@@ -57,6 +66,14 @@ exports.getOrderById = async (req, res) => {
 exports.updateOrder = async (req, res) => {
   const { productName, price, status } = req.body;
 
+  // Validation des entrées
+  if (!productName || typeof productName !== 'string' || productName.trim() === '') {
+    return res.status(400).json({ error: "Le nom du produit est requis et doit être valide." });
+  }
+  if (price === undefined || isNaN(price) || Number(price) < 0) {
+    return res.status(400).json({ error: "Le prix doit être un nombre positif." });
+  }
+
   try {
     const order = await Order.findByPk(req.params.id);
 
@@ -68,7 +85,7 @@ exports.updateOrder = async (req, res) => {
       return res.status(403).json({ error: "Accès refusé. Vous n'êtes pas autorisé à modifier cette commande." });
     }
 
-   
+
     if (status && status !== order.status && req.user.role !== 'admin') {
       return res.status(403).json({ error: "Accès refusé. Seul un administrateur peut modifier le statut d'une commande." });
     }

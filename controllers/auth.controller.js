@@ -2,11 +2,25 @@ const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const { JWT_SECRET } = require('../middlewares/auth.middleware'); 
+const { JWT_SECRET } = require('../middlewares/auth.middleware');
 
 
 exports.register = async (req, res) => {
+
   const { username, password } = req.body;
+
+  // Validation simple des entrées
+
+  if (!username || typeof username !== 'string' || username.trim() === '') {
+
+    return res.status(400).json({ error: "Le nom d'utilisateur est requis." });
+
+  }
+  if (!password || typeof password !== 'string' || password.length < 6) {
+
+    return res.status(400).json({ error: "Le mot de passe doit contenir au moins 6 caractères." });
+
+  }
 
   try {
     const existingUser = await User.findOne({ where: { username } });
@@ -20,7 +34,7 @@ exports.register = async (req, res) => {
     const newUser = await User.create({
       username,
       password: hashedPassword,
-      role: 'user' 
+      role: 'user'
     });
 
     return res.status(201).json({
@@ -42,7 +56,7 @@ exports.login = async (req, res) => {
 
   try {
     const user = await User.findOne({ where: { username } });
-    
+
     if (!user) {
       return res.status(401).json({ error: "Identifiant ou mot de passe incorrect." });
     }
